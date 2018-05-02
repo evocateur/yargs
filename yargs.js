@@ -1035,17 +1035,17 @@ function Yargs (processArgs, cwd, parentRequire) {
         }
       }
 
-      const handlerKeys = command.getCommands()
+      const handlerKeys = new Set(command.getCommands())
       const requestCompletions = completion.completionKey in argv
       const skipRecommendation = argv[helpOpt] || requestCompletions
-      const skipDefaultCommand = skipRecommendation && (handlerKeys.length > 1 || handlerKeys[0] !== '$0')
+      const skipDefaultCommand = skipRecommendation && handlerKeys.size > 1
 
       if (argv._.length) {
-        if (handlerKeys.length) {
+        if (handlerKeys.size) {
           let firstUnknownCommand
           for (let i = (commandIndex || 0), cmd; argv._[i] !== undefined; i++) {
             cmd = String(argv._[i])
-            if (~handlerKeys.indexOf(cmd) && cmd !== completionCommand) {
+            if (handlerKeys.has(cmd) && cmd !== completionCommand) {
               setPlaceholderKeys(argv)
               // commands are executed using a recursive algorithm that executes
               // the deepest command first; we keep track of the position in the
@@ -1066,7 +1066,7 @@ function Yargs (processArgs, cwd, parentRequire) {
           // recommend a command if recommendCommands() has
           // been enabled, and no commands were found to execute
           if (recommendCommands && firstUnknownCommand && !skipRecommendation) {
-            validation.recommendCommands(firstUnknownCommand, handlerKeys)
+            validation.recommendCommands(firstUnknownCommand, Array.from(handlerKeys))
           }
         }
 
