@@ -14,7 +14,7 @@ describe('Completion', () => {
   })
 
   describe('default completion behavior', () => {
-    it('it returns a list of commands as completion suggestions', () => {
+    it('returns a list of commands as completion suggestions', () => {
       const r = checkUsage(() => yargs(['./completion', '--get-yargs-completions', ''])
           .command('foo', 'bar')
           .command('apple', 'banana')
@@ -24,6 +24,7 @@ describe('Completion', () => {
 
       r.logs.should.include('apple')
       r.logs.should.include('foo')
+      r.logs.should.include('completion')
     })
 
     it('avoids interruption from command recommendations', () => {
@@ -39,6 +40,7 @@ describe('Completion', () => {
       r.errors.should.deep.equal([])
       r.logs.should.include('apple')
       r.logs.should.include('aardvark')
+      r.logs.should.not.include('completion')
     })
 
     it('avoids interruption from default command', () => {
@@ -53,6 +55,7 @@ describe('Completion', () => {
       )
 
       r.errors.should.deep.equal([])
+      r.logs.should.not.include('$0')
       r.logs.should.not.include('aardwolf')
       r.logs.should.include('aardvark')
     })
@@ -152,7 +155,7 @@ describe('Completion', () => {
       r.logs.should.include('cmd1')
     })
 
-    it('does not include possitional arguments', function () {
+    it('does not include positional arguments', function () {
       var r = checkUsage(function () {
         return yargs(['./completion', '--get-yargs-completions', 'cmd'])
           .command('cmd1 [arg]', 'first command')
